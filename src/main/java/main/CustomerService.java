@@ -20,7 +20,6 @@ public class CustomerService {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final CustomerParameterMapper customerParameterMapper;
-    private final Crypto crypto;
 
     private static final String INSERT_CUSTOMER
             = "INSERT INTO customer(firstname, secondname, email) VALUES(:firstname, :secondname, :email);";
@@ -31,20 +30,19 @@ public class CustomerService {
     private static final String UPDATE_CUSTOMER
             = "UPDATE customer SET firstname = :firstname, secondname = :secondname, email = :email WHERE id = :id;";
 
-    public CustomerService(NamedParameterJdbcTemplate jdbcTemplate, CustomerParameterMapper customerParameterMapper, Crypto crypto) {
+    public CustomerService(NamedParameterJdbcTemplate jdbcTemplate, CustomerParameterMapper customerParameterMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.customerParameterMapper = customerParameterMapper;
-        this.crypto = crypto;
     }
 
     public void encryptAndSave(Customer customer) throws Exception {
-        jdbcTemplate.update(INSERT_CUSTOMER, customerParameterMapper.buildParamMapForInsertAndSelect(customer, crypto));
+        jdbcTemplate.update(INSERT_CUSTOMER, customerParameterMapper.buildParamMapForInsertAndSelect(customer));
     }
 
     public Customer findCustomer(Customer customer) throws Exception {
         return jdbcTemplate.queryForObject(
                 SELECT_CUSTOMER,
-                customerParameterMapper.buildParamMapForInsertAndSelect(customer, crypto),
+                customerParameterMapper.buildParamMapForInsertAndSelect(customer),
                 new BeanPropertyRowMapper<>(Customer.class)
         );
     }
@@ -52,7 +50,7 @@ public class CustomerService {
     public void updateCustomer(Customer customer) throws Exception {
         jdbcTemplate.update(
                 UPDATE_CUSTOMER,
-                customerParameterMapper.buildParamMapForUpdate(customer, crypto)
+                customerParameterMapper.buildParamMapForUpdate(customer)
         );
     }
 

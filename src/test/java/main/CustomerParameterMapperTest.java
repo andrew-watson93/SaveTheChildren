@@ -10,6 +10,7 @@ import static main.HomeControllerTest.CUSTOMER;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -34,20 +35,37 @@ public class CustomerParameterMapperTest {
     private static final String ENCRYPTED_SECOND_NAME = "ENCRYPTED_SECOND_NAME";
     private static final String ENCRYPTED_EMAIL = "ENCRYPTED_EMAIL";
 
-    @Test
-    public void testBuildParamMap() throws Exception {
+    @Before
+    public void setup() throws Exception {
         when(crypto.encrypt(CUSTOMER.getFirstName())).thenReturn(ENCRYPTED_FIRST_NAME);
         when(crypto.encrypt(CUSTOMER.getSecondName())).thenReturn(ENCRYPTED_SECOND_NAME);
         when(crypto.encrypt(CUSTOMER.getEmail())).thenReturn(ENCRYPTED_EMAIL);
-        Map<String, String> params = customerParameterMapper.buildParamMapForInsertAndSelect(CUSTOMER, crypto);
+    }
+
+    @Test
+    public void testBuildParamMapForInsertAndSelect() throws Exception {
+        Map<String, String> params = customerParameterMapper.buildParamMapForInsertAndSelect(CUSTOMER);
         assertThat(params.size(), is(3));
+        testDefaultAssertions(params);
+
+    }
+
+    @Test
+    public void testBuildParamMapForUpdate() throws Exception {
+        Map<String, String> params = customerParameterMapper.buildParamMapForUpdate(CUSTOMER);
+        assertThat(params.size(), is(4));
+        testDefaultAssertions(params);
+        assertTrue(params.keySet().contains("id"));
+        assertThat(params.get("id"), is(CUSTOMER.getId().toString()));
+    }
+
+    private void testDefaultAssertions(Map<String, String> params) {
         assertTrue(params.keySet().contains("firstname"));
         assertTrue(params.keySet().contains("secondname"));
         assertTrue(params.keySet().contains("email"));
         assertThat(params.get("firstname"), is(ENCRYPTED_FIRST_NAME));
         assertThat(params.get("secondname"), is(ENCRYPTED_SECOND_NAME));
         assertThat(params.get("email"), is(ENCRYPTED_EMAIL));
-
     }
 
 }

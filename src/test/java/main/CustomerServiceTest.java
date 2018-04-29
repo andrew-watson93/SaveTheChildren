@@ -35,7 +35,7 @@ public class CustomerServiceTest {
     private CustomerParameterMapper customerParameterMapper;
 
     @Mock
-    private Crypto crypto;
+    private CustomerDecrypter customerDecrypter;
 
     @InjectMocks
     private CustomerService service;
@@ -45,8 +45,13 @@ public class CustomerServiceTest {
     @Before
     public void setup() throws Exception {
         PARAM_MAP.put("key", "value");
-        when(customerParameterMapper.buildParamMapForInsertAndSelect(CUSTOMER, crypto)).thenReturn(PARAM_MAP);
-        when(customerParameterMapper.buildParamMapForUpdate(CUSTOMER, crypto)).thenReturn(PARAM_MAP);
+        when(customerParameterMapper.buildParamMapForInsertAndSelect(CUSTOMER)).thenReturn(PARAM_MAP);
+        when(customerParameterMapper.buildParamMapForUpdate(CUSTOMER)).thenReturn(PARAM_MAP);
+        when(jdbcTemplate.queryForObject(
+                eq("SELECT * FROM customer WHERE firstname = :firstname AND secondname = :secondname AND email = :email;"),
+                eq(PARAM_MAP),
+                any(RowMapper.class)))
+                .thenReturn(CUSTOMER);
     }
 
     @Test
