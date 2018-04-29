@@ -20,6 +20,7 @@ public class CustomerService {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final CustomerParameterMapper customerParameterMapper;
+    private final Crypto crypto;
 
     private static final String INSERT_CUSTOMER
             = "INSERT INTO customer(firstname, secondname, email) VALUES(:firstname, :secondname, :email);";
@@ -27,19 +28,20 @@ public class CustomerService {
     private static final String SELECT_CUSTOMER
             = "SELECT * FROM customer WHERE firstname = :firstname AND secondname = :secondname AND email = :email;";
 
-    public CustomerService(NamedParameterJdbcTemplate jdbcTemplate, CustomerParameterMapper customerParameterMapper) {
+    public CustomerService(NamedParameterJdbcTemplate jdbcTemplate, CustomerParameterMapper customerParameterMapper, Crypto crypto) {
         this.jdbcTemplate = jdbcTemplate;
         this.customerParameterMapper = customerParameterMapper;
+        this.crypto = crypto;
     }
 
     public void encryptAndSave(Customer customer) throws Exception {
-        jdbcTemplate.update(INSERT_CUSTOMER, customerParameterMapper.buildParamMap(customer));
+        jdbcTemplate.update(INSERT_CUSTOMER, customerParameterMapper.buildParamMap(customer, crypto));
     }
 
     public Customer findCustomer(Customer customer) throws Exception {
         return jdbcTemplate.queryForObject(
                 SELECT_CUSTOMER,
-                customerParameterMapper.buildParamMap(customer),
+                customerParameterMapper.buildParamMap(customer, crypto),
                 new BeanPropertyRowMapper<>(Customer.class)
         );
     }

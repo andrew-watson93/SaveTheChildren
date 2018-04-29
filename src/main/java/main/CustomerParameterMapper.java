@@ -16,13 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 class CustomerParameterMapper {
 
-    private final Crypto crypto;
-
-    public CustomerParameterMapper(Crypto crypto) {
-        this.crypto = crypto;
-    }
-
-    public Map<String, String> buildParamMap(Customer customer) throws Exception {
+    public Map<String, String> buildParamMap(Customer customer, Crypto crypto) throws Exception {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("firstname", crypto.encrypt(customer.getFirstName()));
         parameters.put("secondname", crypto.encrypt(customer.getSecondName()));

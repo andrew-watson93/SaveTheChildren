@@ -39,7 +39,7 @@ public class CustomerParameterMapperTest {
         when(crypto.encrypt(CUSTOMER.getFirstName())).thenReturn(ENCRYPTED_FIRST_NAME);
         when(crypto.encrypt(CUSTOMER.getSecondName())).thenReturn(ENCRYPTED_SECOND_NAME);
         when(crypto.encrypt(CUSTOMER.getEmail())).thenReturn(ENCRYPTED_EMAIL);
-        Map<String, String> params = customerParameterMapper.buildParamMap(CUSTOMER);
+        Map<String, String> params = customerParameterMapper.buildParamMap(CUSTOMER, crypto);
         assertThat(params.size(), is(3));
         assertTrue(params.keySet().contains("firstname"));
         assertTrue(params.keySet().contains("secondname"));

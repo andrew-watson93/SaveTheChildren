@@ -34,6 +34,9 @@ public class CustomerServiceTest {
     @Mock
     private CustomerParameterMapper customerParameterMapper;
 
+    @Mock
+    private Crypto crypto;
+
     @InjectMocks
     private CustomerService service;
 
@@ -42,7 +45,7 @@ public class CustomerServiceTest {
     @Before
     public void setup() throws Exception {
         PARAM_MAP.put("key", "value");
-        when(customerParameterMapper.buildParamMap(CUSTOMER)).thenReturn(PARAM_MAP);
+        when(customerParameterMapper.buildParamMap(CUSTOMER, crypto)).thenReturn(PARAM_MAP);
     }
 
     @Test
