@@ -18,6 +18,16 @@ class Customer {
     private Integer customerId;
     private String email;
 
+    public Customer(String firstName, String secondName, Integer customerId, String email) {
+        this.firstName = firstName;
+        this.secondName = secondName;
+        this.customerId = customerId;
+        this.email = email;
+    }
+
+    public Customer() {
+    }
+
     /**
      * @return the firstName
      */

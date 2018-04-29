@@ -19,17 +19,19 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class HomeController {
 
-    private final SaveCustomerService service;
+    private final CustomerService service;
 
-    public HomeController(SaveCustomerService service) {
+    public HomeController(CustomerService service) {
         this.service = service;
     }
 
     @PostMapping("/save")
-
     public @ResponseBody
     ResponseEntity saveCustomer(@RequestBody Customer customer) {
-        service.encryptAndSave(customer);
+        Customer existing = service.findCustomer(customer);
+        if (existing != null) {
+            service.updateCustomer(customer);
+        }
         return new ResponseEntity(HttpStatus.OK);
     }
 

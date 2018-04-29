@@ -7,7 +7,8 @@ import org.junit.runner.RunWith;
 import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,10 +24,17 @@ public class HomeControllerTest {
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Mock
-    private SaveCustomerService service;
+    private CustomerService service;
 
     @InjectMocks
     private HomeController homeController;
+
+    private static final String FIRST_NAME = "FIRST_NAME";
+    private static final String SECOND_NAME = "SECOND_NAME";
+    private static final Integer ID = 1;
+    private static final String EMAIL = "EMAIL";
+
+    private static final Customer CUSTOMER = new Customer(FIRST_NAME, SECOND_NAME, ID, EMAIL);
 
     @Before
     public void setUp() {
@@ -43,16 +51,23 @@ public class HomeControllerTest {
     }
 
     @Test
-    public void saveCustomer_CallsService() throws Exception {
-        Customer customer = new Customer();
-        customer.setFirstName("andy");
-        customer.setSecondName("watson");
-        customer.setEmail("email");
+    public void saveCustomer_CallsGetCustomer() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/save")
-                .content(mapper.writeValueAsString(customer))
+                .content(mapper.writeValueAsString(CUSTOMER))
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk());
-        Mockito.verify(service).encryptAndSave(eq(customer));
+        verify(service).findCustomer(eq(CUSTOMER));
+
+    }
+
+    @Test
+    public void saveCustomer_CallsUpdateCustomerIfAlreadyExists() throws Exception {
+        when(service.findCustomer(CUSTOMER)).thenReturn(new Customer());
+        mockMvc.perform(MockMvcRequestBuilders.post("/save")
+                .content(mapper.writeValueAsString(CUSTOMER))
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk());
+        verify(service).updateCustomer(eq(CUSTOMER));
 
     }
 
