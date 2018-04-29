@@ -31,6 +31,8 @@ public class HomeController {
         Customer existing = service.findCustomer(customer);
         if (existing != null) {
             service.updateCustomer(customer);
+        } else {
+            service.encryptAndSave(customer);
         }
         return new ResponseEntity(HttpStatus.OK);
     }

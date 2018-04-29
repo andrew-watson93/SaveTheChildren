@@ -44,18 +44,12 @@ public class HomeControllerTest {
 
     @Test
     public void saveCustomer_EndpointExists() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/save")
-                .content("{}")
-                .contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk());
+        callSaveEndpoint();
     }
 
     @Test
     public void saveCustomer_CallsGetCustomer() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/save")
-                .content(mapper.writeValueAsString(CUSTOMER))
-                .contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk());
+        callSaveEndpoint();
         verify(service).findCustomer(eq(CUSTOMER));
 
     }
@@ -63,12 +57,21 @@ public class HomeControllerTest {
     @Test
     public void saveCustomer_CallsUpdateCustomerIfAlreadyExists() throws Exception {
         when(service.findCustomer(CUSTOMER)).thenReturn(new Customer());
+        callSaveEndpoint();
+        verify(service).updateCustomer(eq(CUSTOMER));
+    }
+
+    @Test
+    public void saveCustomer_CallsCreateIfOneDoesNotExist() throws Exception {
+        callSaveEndpoint();
+        verify(service).encryptAndSave(eq(CUSTOMER));
+    }
+
+    private void callSaveEndpoint() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/save")
                 .content(mapper.writeValueAsString(CUSTOMER))
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk());
-        verify(service).updateCustomer(eq(CUSTOMER));
-
     }
 
 }
