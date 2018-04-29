@@ -5,6 +5,7 @@
  */
 package main;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -24,8 +25,11 @@ public class CustomerService {
     private static final String INSERT_CUSTOMER
             = "INSERT INTO customer(firstname, secondname, email) VALUES(:firstname, :secondname, :email);";
 
-    private static final String SELECT_CUSTOMER
+    private static final String SELECT_CUSTOMER_BY_ATTRIBUTES
             = "SELECT * FROM customer WHERE firstname = :firstname AND secondname = :secondname AND email = :email;";
+
+    private static final String SELECT_CUSTOMER_BY_ID
+            = "SELECT * FROM customer WHERE id = :id;";
 
     private static final String UPDATE_CUSTOMER
             = "UPDATE customer SET firstname = :firstname, secondname = :secondname, email = :email WHERE id = :id;";
@@ -40,17 +44,33 @@ public class CustomerService {
     }
 
     public Customer findCustomer(Customer customer) throws Exception {
-        return jdbcTemplate.queryForObject(
-                SELECT_CUSTOMER,
-                customerParameterMapper.buildParamMapForInsertAndSelect(customer),
-                new BeanPropertyRowMapper<>(Customer.class)
-        );
+        try {
+            return customer.getId() != null ? findById(customer) : findByAttributes(customer);
+        } catch (EmptyResultDataAccessException ex) {
+            return null;
+        }
     }
 
     public void updateCustomer(Customer customer) throws Exception {
         jdbcTemplate.update(
                 UPDATE_CUSTOMER,
                 customerParameterMapper.buildParamMapForUpdate(customer)
+        );
+    }
+
+    private Customer findById(Customer customer) {
+        return jdbcTemplate.queryForObject(
+                SELECT_CUSTOMER_BY_ID,
+                customerParameterMapper.buildParameterForSelectById(customer),
+                new BeanPropertyRowMapper<>(Customer.class)
+        );
+    }
+
+    private Customer findByAttributes(Customer customer) throws Exception {
+        return jdbcTemplate.queryForObject(
+                SELECT_CUSTOMER_BY_ATTRIBUTES,
+                customerParameterMapper.buildParamMapForInsertAndSelect(customer),
+                new BeanPropertyRowMapper<>(Customer.class)
         );
     }
 

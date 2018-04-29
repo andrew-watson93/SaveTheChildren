@@ -34,7 +34,8 @@ public class HomeControllerTest {
     private static final Integer ID = 1;
     private static final String EMAIL = "EMAIL";
 
-    public static final Customer CUSTOMER = new Customer(FIRST_NAME, SECOND_NAME, ID, EMAIL);
+    public static final Customer CUSTOMER_WITH_ID = new Customer(FIRST_NAME, SECOND_NAME, ID, EMAIL);
+    public static final Customer CUSTOMER_WITH_NO_ID = new Customer(FIRST_NAME, SECOND_NAME, null, EMAIL);
 
     @Before
     public void setUp() {
@@ -50,26 +51,26 @@ public class HomeControllerTest {
     @Test
     public void saveCustomer_CallsGetCustomer() throws Exception {
         callSaveEndpoint();
-        verify(service).findCustomer(eq(CUSTOMER));
+        verify(service).findCustomer(eq(CUSTOMER_WITH_ID));
 
     }
 
     @Test
     public void saveCustomer_CallsUpdateCustomerIfAlreadyExists() throws Exception {
-        when(service.findCustomer(CUSTOMER)).thenReturn(new Customer());
+        when(service.findCustomer(CUSTOMER_WITH_ID)).thenReturn(new Customer());
         callSaveEndpoint();
-        verify(service).updateCustomer(eq(CUSTOMER));
+        verify(service).updateCustomer(eq(CUSTOMER_WITH_ID));
     }
 
     @Test
     public void saveCustomer_CallsCreateIfOneDoesNotExist() throws Exception {
         callSaveEndpoint();
-        verify(service).encryptAndSave(eq(CUSTOMER));
+        verify(service).encryptAndSave(eq(CUSTOMER_WITH_ID));
     }
 
     private void callSaveEndpoint() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/save")
-                .content(mapper.writeValueAsString(CUSTOMER))
+                .content(mapper.writeValueAsString(CUSTOMER_WITH_ID))
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk());
     }

@@ -32,6 +32,12 @@ class CustomerParameterMapper {
         return map;
     }
 
+    public Map<String, String> buildParameterForSelectById(Customer customer) {
+        Map<String, String> map = new HashMap<>();
+        map.put("id", customer.getId().toString());
+        return map;
+    }
+
     private Map<String, String> createDefaultParamMap(Customer customer) throws Exception {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("firstname", crypto.encrypt(customer.getFirstName()));

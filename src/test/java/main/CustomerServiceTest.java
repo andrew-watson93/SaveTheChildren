@@ -7,7 +7,8 @@ package main;
 
 import java.util.HashMap;
 import java.util.Map;
-import static main.HomeControllerTest.CUSTOMER;
+import static main.HomeControllerTest.CUSTOMER_WITH_ID;
+import static main.HomeControllerTest.CUSTOMER_WITH_NO_ID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,29 +43,40 @@ public class CustomerServiceTest {
     @Before
     public void setup() throws Exception {
         PARAM_MAP.put("key", "value");
-        when(customerParameterMapper.buildParamMapForInsertAndSelect(CUSTOMER)).thenReturn(PARAM_MAP);
-        when(customerParameterMapper.buildParamMapForUpdate(CUSTOMER)).thenReturn(PARAM_MAP);
+        when(customerParameterMapper.buildParamMapForInsertAndSelect(CUSTOMER_WITH_NO_ID)).thenReturn(PARAM_MAP);
+        when(customerParameterMapper.buildParamMapForInsertAndSelect(CUSTOMER_WITH_ID)).thenReturn(PARAM_MAP);
+        when(customerParameterMapper.buildParamMapForUpdate(CUSTOMER_WITH_ID)).thenReturn(PARAM_MAP);
+        when(customerParameterMapper.buildParameterForSelectById(CUSTOMER_WITH_ID)).thenReturn(PARAM_MAP);
         when(jdbcTemplate.queryForObject(
                 eq("SELECT * FROM customer WHERE firstname = :firstname AND secondname = :secondname AND email = :email;"),
                 eq(PARAM_MAP),
                 any(RowMapper.class)))
-                .thenReturn(CUSTOMER);
+                .thenReturn(CUSTOMER_WITH_ID);
     }
 
     @Test
     public void findCustomer_QueriesForEncryptedObject() throws Exception {
-        service.findCustomer(CUSTOMER);
+        service.findCustomer(CUSTOMER_WITH_NO_ID);
         verify(jdbcTemplate).queryForObject(
                 eq("SELECT * FROM customer WHERE firstname = :firstname AND secondname = :secondname AND email = :email;"),
                 eq(PARAM_MAP),
                 any(RowMapper.class)
         );
+    }
 
+    @Test
+    public void findCustomer_TriesToFindByIdIfProvided() throws Exception {
+        service.findCustomer(CUSTOMER_WITH_ID);
+        verify(jdbcTemplate).queryForObject(
+                eq("SELECT * FROM customer WHERE id = :id;"),
+                eq(PARAM_MAP),
+                any(RowMapper.class)
+        );
     }
 
     @Test
     public void encryptAndSave() throws Exception {
-        service.encryptAndSave(CUSTOMER);
+        service.encryptAndSave(CUSTOMER_WITH_ID);
         verify(jdbcTemplate).update(
                 eq("INSERT INTO customer(firstname, secondname, email) VALUES(:firstname, :secondname, :email);"),
                 eq(PARAM_MAP)
@@ -73,7 +85,7 @@ public class CustomerServiceTest {
 
     @Test
     public void updateCustomer() throws Exception {
-        service.updateCustomer(CUSTOMER);
+        service.updateCustomer(CUSTOMER_WITH_ID);
         verify(jdbcTemplate).update(
                 eq("UPDATE customer SET firstname = :firstname, secondname = :secondname, email = :email WHERE id = :id;"),
                 eq(PARAM_MAP)

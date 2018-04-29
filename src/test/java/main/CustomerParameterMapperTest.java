@@ -6,7 +6,7 @@
 package main;
 
 import java.util.Map;
-import static main.HomeControllerTest.CUSTOMER;
+import static main.HomeControllerTest.CUSTOMER_WITH_ID;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -37,14 +37,14 @@ public class CustomerParameterMapperTest {
 
     @Before
     public void setup() throws Exception {
-        when(crypto.encrypt(CUSTOMER.getFirstName())).thenReturn(ENCRYPTED_FIRST_NAME);
-        when(crypto.encrypt(CUSTOMER.getSecondName())).thenReturn(ENCRYPTED_SECOND_NAME);
-        when(crypto.encrypt(CUSTOMER.getEmail())).thenReturn(ENCRYPTED_EMAIL);
+        when(crypto.encrypt(CUSTOMER_WITH_ID.getFirstName())).thenReturn(ENCRYPTED_FIRST_NAME);
+        when(crypto.encrypt(CUSTOMER_WITH_ID.getSecondName())).thenReturn(ENCRYPTED_SECOND_NAME);
+        when(crypto.encrypt(CUSTOMER_WITH_ID.getEmail())).thenReturn(ENCRYPTED_EMAIL);
     }
 
     @Test
     public void testBuildParamMapForInsertAndSelect() throws Exception {
-        Map<String, String> params = customerParameterMapper.buildParamMapForInsertAndSelect(CUSTOMER);
+        Map<String, String> params = customerParameterMapper.buildParamMapForInsertAndSelect(CUSTOMER_WITH_ID);
         assertThat(params.size(), is(3));
         testDefaultAssertions(params);
 
@@ -52,11 +52,22 @@ public class CustomerParameterMapperTest {
 
     @Test
     public void testBuildParamMapForUpdate() throws Exception {
-        Map<String, String> params = customerParameterMapper.buildParamMapForUpdate(CUSTOMER);
+        Map<String, String> params = customerParameterMapper.buildParamMapForUpdate(CUSTOMER_WITH_ID);
         assertThat(params.size(), is(4));
         testDefaultAssertions(params);
+        testIdAssertions(params);
+    }
+
+    @Test
+    public void testBuildParameterForSelectById() {
+        Map<String, String> params = customerParameterMapper.buildParameterForSelectById(CUSTOMER_WITH_ID);
+        assertThat(params.size(), is(1));
+        testIdAssertions(params);
+    }
+
+    private void testIdAssertions(Map<String, String> params) {
         assertTrue(params.keySet().contains("id"));
-        assertThat(params.get("id"), is(CUSTOMER.getId().toString()));
+        assertThat(params.get("id"), is(CUSTOMER_WITH_ID.getId().toString()));
     }
 
     private void testDefaultAssertions(Map<String, String> params) {
