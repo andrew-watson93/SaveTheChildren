@@ -34,9 +34,6 @@ public class CustomerServiceTest {
     @Mock
     private CustomerParameterMapper customerParameterMapper;
 
-    @Mock
-    private CustomerDecrypter customerDecrypter;
-
     @InjectMocks
     private CustomerService service;
 
