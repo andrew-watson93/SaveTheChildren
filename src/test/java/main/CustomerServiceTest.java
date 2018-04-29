@@ -28,15 +28,26 @@ public class CustomerServiceTest {
     @Mock
     private JdbcTemplate jdbcTemplate;
 
+    @Mock
+    Crypto crypto;
+
     @InjectMocks
     private CustomerService service;
 
     @Test
-    public void findCustomer_QueriesForObject() {
+    public void findCustomer_QueriesForEncryptedObject() throws Exception {
+        String firstNameEncrypted = "firstnameencrypted";
+        String secondNameEncrypted = "secondNameEncrypted";
+        String emailEncrypted = "emailEncrypted";
+
+        when(crypto.encrypt(CUSTOMER.getFirstName())).thenReturn(firstNameEncrypted);
+        when(crypto.encrypt(CUSTOMER.getSecondName())).thenReturn(secondNameEncrypted);
+        when(crypto.encrypt(CUSTOMER.getEmail())).thenReturn(emailEncrypted);
+
         when(jdbcTemplate.queryForObject(any(String.class), any(Object[].class), any(RowMapper.class))).thenReturn(CUSTOMER);
         service.findCustomer(CUSTOMER);
         verify(jdbcTemplate).queryForObject(eq("SELECT * FROM customer WHERE firstname = ? AND secondname = ? AND email = ?"),
-                eq(new Object[]{CUSTOMER.getFirstName(), CUSTOMER.getSecondName(), CUSTOMER.getEmail()}),
+                eq(new Object[]{firstNameEncrypted, secondNameEncrypted, emailEncrypted}),
                 any(RowMapper.class));
     }
 

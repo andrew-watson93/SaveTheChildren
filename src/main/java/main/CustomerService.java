@@ -19,19 +19,25 @@ import org.springframework.stereotype.Service;
 public class CustomerService {
 
     private final JdbcTemplate jdbcTemplate;
+    private final Crypto crypto;
 
-    public CustomerService(JdbcTemplate jdbcTemplate) {
+    public CustomerService(JdbcTemplate jdbcTemplate, Crypto crypto) {
         this.jdbcTemplate = jdbcTemplate;
+        this.crypto = crypto;
     }
 
     public void encryptAndSave(Customer customer) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public Customer findCustomer(Customer customer) {
+    public Customer findCustomer(Customer customer) throws Exception {
         return jdbcTemplate.queryForObject(
                 "SELECT * FROM customer WHERE firstname = ? AND secondname = ? AND email = ?",
-                new Object[]{customer.getFirstName(), customer.getSecondName(), customer.getEmail()},
+                new Object[]{
+                    crypto.encrypt(customer.getFirstName()),
+                    crypto.encrypt(customer.getSecondName()),
+                    crypto.encrypt(customer.getEmail())
+                },
                 new BeanPropertyRowMapper<>(Customer.class)
         );
 
