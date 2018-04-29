@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
-Test set: hello.WebMockTest
+Test set: hello.HomeControllerTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.756 s - in hello.WebMockTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.727 s - in hello.HomeControllerTest

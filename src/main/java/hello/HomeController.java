@@ -19,9 +19,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class HomeController {
 
+    private final SaveCustomerService service;
+
+    public HomeController(SaveCustomerService service) {
+        this.service = service;
+    }
+
     @PostMapping("/save")
+
     public @ResponseBody
     ResponseEntity saveCustomer(@RequestBody Customer customer) {
+        service.encryptAndSave(customer);
         return new ResponseEntity(HttpStatus.OK);
     }
 
