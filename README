@@ -2,3 +2,5 @@ To run simply:
 
 mvn clean install
 mvn spring-boot:run
+
+An h2 database will be spun up and can be seen at http://localhost:8080/h2
