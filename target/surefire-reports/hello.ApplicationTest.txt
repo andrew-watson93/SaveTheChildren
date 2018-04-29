@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 Test set: hello.ApplicationTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 3.828 s <<< FAILURE! - in hello.ApplicationTest
-shouldReturnDefaultMessage(hello.ApplicationTest)  Time elapsed: 0.206 s  <<< FAILURE!
+Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 4.433 s <<< FAILURE! - in hello.ApplicationTest
+shouldReturnDefaultMessage(hello.ApplicationTest)  Time elapsed: 0.226 s  <<< FAILURE!
 java.lang.AssertionError: 
 Response content
 Expected: a string containing "Hello World"
