@@ -35,9 +35,6 @@ public class CustomerServiceTest {
     @Mock
     private CustomerParameterMapper customerParameterMapper;
 
-    @Mock
-    private CustomerValidator customerValidator;
-
     @InjectMocks
     private CustomerService service;
 
@@ -59,7 +56,6 @@ public class CustomerServiceTest {
     @Test
     public void findCustomer_QueriesForEncryptedObject() throws Exception {
         service.findCustomer(CUSTOMER_WITH_NO_ID);
-        verify(customerValidator).validateAttributes(eq(CUSTOMER_WITH_NO_ID));
         verify(jdbcTemplate).queryForObject(
                 eq("SELECT * FROM customer WHERE firstname = :firstname AND secondname = :secondname AND email = :email;"),
                 eq(PARAM_MAP),
@@ -80,7 +76,6 @@ public class CustomerServiceTest {
     @Test
     public void encryptAndSave() throws Exception {
         service.encryptAndSave(CUSTOMER_WITH_NO_ID);
-        verify(customerValidator).validateAttributes(eq(CUSTOMER_WITH_NO_ID));
         verify(jdbcTemplate).update(
                 eq("INSERT INTO customer(firstname, secondname, email) VALUES(:firstname, :secondname, :email);"),
                 eq(PARAM_MAP)
@@ -90,7 +85,6 @@ public class CustomerServiceTest {
     @Test
     public void updateCustomer() throws Exception {
         service.updateCustomer(CUSTOMER_WITH_ID);
-        verify(customerValidator).validateAttributes(eq(CUSTOMER_WITH_ID));
         verify(jdbcTemplate).update(
                 eq("UPDATE customer SET firstname = :firstname, secondname = :secondname, email = :email WHERE id = :id;"),
                 eq(PARAM_MAP)

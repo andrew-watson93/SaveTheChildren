@@ -19,20 +19,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HomeController {
 
-    private final CustomerService service;
+    private final CustomerService customerService;
+    private final CustomerValidator customerValidator;
 
-    public HomeController(CustomerService service) {
-        this.service = service;
+    public HomeController(CustomerService service, CustomerValidator customerValidator) {
+        this.customerService = service;
+        this.customerValidator = customerValidator;
     }
 
     @PostMapping("/save")
     public @ResponseBody
     ResponseEntity saveCustomer(@RequestBody Customer customer) throws Exception {
-        Customer existing = service.findCustomer(customer);
+        customerValidator.validateAttributes(customer);
+        Customer existing = customerService.findCustomer(customer);
         if (existing != null) {
-            service.updateCustomer(customer);
+            customerService.updateCustomer(customer);
         } else {
-            service.encryptAndSave(customer);
+            customerService.encryptAndSave(customer);
         }
         return new ResponseEntity(HttpStatus.OK);
     }

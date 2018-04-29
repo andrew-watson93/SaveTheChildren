@@ -21,7 +21,6 @@ public class CustomerService {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final CustomerParameterMapper customerParameterMapper;
-    private final CustomerValidator customerValidator;
 
     private static final String INSERT_CUSTOMER
             = "INSERT INTO customer(firstname, secondname, email) VALUES(:firstname, :secondname, :email);";
@@ -37,16 +36,13 @@ public class CustomerService {
 
     public CustomerService(
             NamedParameterJdbcTemplate jdbcTemplate,
-            CustomerParameterMapper customerParameterMapper,
-            CustomerValidator customerValidator
+            CustomerParameterMapper customerParameterMapper
     ) {
         this.jdbcTemplate = jdbcTemplate;
         this.customerParameterMapper = customerParameterMapper;
-        this.customerValidator = customerValidator;
     }
 
     public void encryptAndSave(Customer customer) throws Exception {
-        customerValidator.validateAttributes(customer);
         jdbcTemplate.update(INSERT_CUSTOMER, customerParameterMapper.buildParamMapForInsertAndSelect(customer));
     }
 
@@ -59,27 +55,28 @@ public class CustomerService {
     }
 
     public void updateCustomer(Customer customer) throws Exception {
-        customerValidator.validateAttributes(customer);
         jdbcTemplate.update(
                 UPDATE_CUSTOMER,
                 customerParameterMapper.buildParamMapForUpdate(customer)
         );
+
     }
 
     private Customer findById(Customer customer) {
         return jdbcTemplate.queryForObject(
                 SELECT_CUSTOMER_BY_ID,
                 customerParameterMapper.buildParameterForSelectById(customer),
-                new BeanPropertyRowMapper<>(Customer.class)
+                new BeanPropertyRowMapper<>(Customer.class
+                )
         );
     }
 
     private Customer findByAttributes(Customer customer) throws Exception {
-        customerValidator.validateAttributes(customer);
         return jdbcTemplate.queryForObject(
                 SELECT_CUSTOMER_BY_ATTRIBUTES,
                 customerParameterMapper.buildParamMapForInsertAndSelect(customer),
-                new BeanPropertyRowMapper<>(Customer.class)
+                new BeanPropertyRowMapper<>(Customer.class
+                )
         );
     }
 

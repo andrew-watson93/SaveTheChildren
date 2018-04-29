@@ -26,6 +26,9 @@ public class HomeControllerTest {
     @Mock
     private CustomerService service;
 
+    @Mock
+    private CustomerValidator customerValidator;
+
     @InjectMocks
     private HomeController homeController;
 
@@ -66,6 +69,12 @@ public class HomeControllerTest {
     public void saveCustomer_CallsCreateIfOneDoesNotExist() throws Exception {
         callSaveEndpoint();
         verify(service).encryptAndSave(eq(CUSTOMER_WITH_ID));
+    }
+
+    @Test
+    public void saveCustomer_CallsValidator() throws Exception {
+        callSaveEndpoint();
+        verify(customerValidator).validateAttributes(eq(CUSTOMER_WITH_ID));
     }
 
     private void callSaveEndpoint() throws Exception {
