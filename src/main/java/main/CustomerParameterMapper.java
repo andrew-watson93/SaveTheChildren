@@ -16,12 +16,16 @@ import org.springframework.stereotype.Service;
 @Service
 class CustomerParameterMapper {
 
-    public Map<String, String> buildParamMap(Customer customer, Crypto crypto) throws Exception {
+    public Map<String, String> buildParamMapForInsertAndSelect(Customer customer, Crypto crypto) throws Exception {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("firstname", crypto.encrypt(customer.getFirstName()));
         parameters.put("secondname", crypto.encrypt(customer.getSecondName()));
         parameters.put("email", crypto.encrypt(customer.getEmail()));
         return parameters;
+    }
+
+    public Map<String, String> buildParamMapForUpdate(Customer customer, Crypto crypto) {
+        return null;
     }
 
 }

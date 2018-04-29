@@ -45,7 +45,8 @@ public class CustomerServiceTest {
     @Before
     public void setup() throws Exception {
         PARAM_MAP.put("key", "value");
-        when(customerParameterMapper.buildParamMap(CUSTOMER, crypto)).thenReturn(PARAM_MAP);
+        when(customerParameterMapper.buildParamMapForInsertAndSelect(CUSTOMER, crypto)).thenReturn(PARAM_MAP);
+        when(customerParameterMapper.buildParamMapForUpdate(CUSTOMER, crypto)).thenReturn(PARAM_MAP);
     }
 
     @Test
@@ -64,6 +65,15 @@ public class CustomerServiceTest {
         service.encryptAndSave(CUSTOMER);
         verify(jdbcTemplate).update(
                 eq("INSERT INTO customer(firstname, secondname, email) VALUES(:firstname, :secondname, :email);"),
+                eq(PARAM_MAP)
+        );
+    }
+
+    @Test
+    public void updateCustomer() throws Exception {
+        service.updateCustomer(CUSTOMER);
+        verify(jdbcTemplate).update(
+                eq("UPDATE customer SET firstname = :firstname, secondname = :secondname, email = :email WHERE id = :id;"),
                 eq(PARAM_MAP)
         );
     }

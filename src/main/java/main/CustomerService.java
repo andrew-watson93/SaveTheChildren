@@ -28,6 +28,9 @@ public class CustomerService {
     private static final String SELECT_CUSTOMER
             = "SELECT * FROM customer WHERE firstname = :firstname AND secondname = :secondname AND email = :email;";
 
+    private static final String UPDATE_CUSTOMER
+            = "UPDATE customer SET firstname = :firstname, secondname = :secondname, email = :email WHERE id = :id;";
+
     public CustomerService(NamedParameterJdbcTemplate jdbcTemplate, CustomerParameterMapper customerParameterMapper, Crypto crypto) {
         this.jdbcTemplate = jdbcTemplate;
         this.customerParameterMapper = customerParameterMapper;
@@ -35,19 +38,22 @@ public class CustomerService {
     }
 
     public void encryptAndSave(Customer customer) throws Exception {
-        jdbcTemplate.update(INSERT_CUSTOMER, customerParameterMapper.buildParamMap(customer, crypto));
+        jdbcTemplate.update(INSERT_CUSTOMER, customerParameterMapper.buildParamMapForInsertAndSelect(customer, crypto));
     }
 
     public Customer findCustomer(Customer customer) throws Exception {
         return jdbcTemplate.queryForObject(
                 SELECT_CUSTOMER,
-                customerParameterMapper.buildParamMap(customer, crypto),
+                customerParameterMapper.buildParamMapForInsertAndSelect(customer, crypto),
                 new BeanPropertyRowMapper<>(Customer.class)
         );
     }
 
-    public void updateCustomer(Customer eq) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void updateCustomer(Customer customer) throws Exception {
+        jdbcTemplate.update(
+                UPDATE_CUSTOMER,
+                customerParameterMapper.buildParamMapForUpdate(customer, crypto)
+        );
     }
 
 }
