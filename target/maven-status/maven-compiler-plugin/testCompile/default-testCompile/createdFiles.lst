@@ -1,2 +1,4 @@
+main\CustomerValidatorTest.class
 main\HomeControllerTest.class
+main\CustomerParameterMapperTest.class
 main\CustomerServiceTest.class

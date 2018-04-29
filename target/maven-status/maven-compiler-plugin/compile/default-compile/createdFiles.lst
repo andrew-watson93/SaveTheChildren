@@ -1,5 +1,7 @@
 main\Customer.class
+main\CustomerParameterMapper.class
 main\Application.class
 main\CustomerService.class
 main\Crypto.class
+main\CustomerValidator.class
 main\HomeController.class
