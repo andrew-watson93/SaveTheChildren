@@ -21,6 +21,7 @@ public class CustomerService {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final CustomerParameterMapper customerParameterMapper;
+    private final CustomerValidator customerValidator;
 
     private static final String INSERT_CUSTOMER
             = "INSERT INTO customer(firstname, secondname, email) VALUES(:firstname, :secondname, :email);";
@@ -34,12 +35,18 @@ public class CustomerService {
     private static final String UPDATE_CUSTOMER
             = "UPDATE customer SET firstname = :firstname, secondname = :secondname, email = :email WHERE id = :id;";
 
-    public CustomerService(NamedParameterJdbcTemplate jdbcTemplate, CustomerParameterMapper customerParameterMapper) {
+    public CustomerService(
+            NamedParameterJdbcTemplate jdbcTemplate,
+            CustomerParameterMapper customerParameterMapper,
+            CustomerValidator customerValidator
+    ) {
         this.jdbcTemplate = jdbcTemplate;
         this.customerParameterMapper = customerParameterMapper;
+        this.customerValidator = customerValidator;
     }
 
     public void encryptAndSave(Customer customer) throws Exception {
+        customerValidator.validateAttributes(customer);
         jdbcTemplate.update(INSERT_CUSTOMER, customerParameterMapper.buildParamMapForInsertAndSelect(customer));
     }
 
@@ -52,6 +59,7 @@ public class CustomerService {
     }
 
     public void updateCustomer(Customer customer) throws Exception {
+        customerValidator.validateAttributes(customer);
         jdbcTemplate.update(
                 UPDATE_CUSTOMER,
                 customerParameterMapper.buildParamMapForUpdate(customer)
@@ -67,6 +75,7 @@ public class CustomerService {
     }
 
     private Customer findByAttributes(Customer customer) throws Exception {
+        customerValidator.validateAttributes(customer);
         return jdbcTemplate.queryForObject(
                 SELECT_CUSTOMER_BY_ATTRIBUTES,
                 customerParameterMapper.buildParamMapForInsertAndSelect(customer),
