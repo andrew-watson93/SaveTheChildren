@@ -12,11 +12,13 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author andre
  */
+@Service
 public class Crypto {
 
     //http://www.adeveloperdiary.com/java/how-to-easily-encrypt-and-decrypt-text-in-java/

@@ -6,7 +6,7 @@
 package main;
 
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
@@ -18,29 +18,30 @@ import org.springframework.stereotype.Service;
 @Repository
 public class CustomerService {
 
-    private final JdbcTemplate jdbcTemplate;
-    private final Crypto crypto;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
+    private final CustomerParameterMapper customerParameterMapper;
 
-    public CustomerService(JdbcTemplate jdbcTemplate, Crypto crypto) {
+    private static final String INSERT_CUSTOMER
+            = "INSERT INTO customer(firstname, secondname, email) VALUES(:firstname, :secondname, :email);";
+
+    private static final String SELECT_CUSTOMER
+            = "SELECT * FROM customer WHERE firstname = :firstname AND secondname = :secondname AND email = :email;";
+
+    public CustomerService(NamedParameterJdbcTemplate jdbcTemplate, CustomerParameterMapper customerParameterMapper) {
         this.jdbcTemplate = jdbcTemplate;
-        this.crypto = crypto;
+        this.customerParameterMapper = customerParameterMapper;
     }
 
-    public void encryptAndSave(Customer customer) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void encryptAndSave(Customer customer) throws Exception {
+        jdbcTemplate.update(INSERT_CUSTOMER, customerParameterMapper.buildParamMap(customer));
     }
 
     public Customer findCustomer(Customer customer) throws Exception {
         return jdbcTemplate.queryForObject(
-                "SELECT * FROM customer WHERE firstname = ? AND secondname = ? AND email = ?",
-                new Object[]{
-                    crypto.encrypt(customer.getFirstName()),
-                    crypto.encrypt(customer.getSecondName()),
-                    crypto.encrypt(customer.getEmail())
-                },
+                SELECT_CUSTOMER,
+                customerParameterMapper.buildParamMap(customer),
                 new BeanPropertyRowMapper<>(Customer.class)
         );
-
     }
 
     public void updateCustomer(Customer eq) {

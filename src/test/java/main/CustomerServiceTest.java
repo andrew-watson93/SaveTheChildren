@@ -5,7 +5,10 @@
  */
 package main;
 
+import java.util.HashMap;
+import java.util.Map;
 import static main.HomeControllerTest.CUSTOMER;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.ArgumentMatchers.any;
@@ -15,8 +18,8 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 /**
  *
@@ -26,29 +29,40 @@ import org.springframework.jdbc.core.RowMapper;
 public class CustomerServiceTest {
 
     @Mock
-    private JdbcTemplate jdbcTemplate;
+    private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Mock
-    Crypto crypto;
+    private CustomerParameterMapper customerParameterMapper;
 
     @InjectMocks
     private CustomerService service;
 
+    private static final Map<String, String> PARAM_MAP = new HashMap<>();
+
+    @Before
+    public void setup() throws Exception {
+        PARAM_MAP.put("key", "value");
+        when(customerParameterMapper.buildParamMap(CUSTOMER)).thenReturn(PARAM_MAP);
+    }
+
     @Test
     public void findCustomer_QueriesForEncryptedObject() throws Exception {
-        String firstNameEncrypted = "firstnameencrypted";
-        String secondNameEncrypted = "secondNameEncrypted";
-        String emailEncrypted = "emailEncrypted";
-
-        when(crypto.encrypt(CUSTOMER.getFirstName())).thenReturn(firstNameEncrypted);
-        when(crypto.encrypt(CUSTOMER.getSecondName())).thenReturn(secondNameEncrypted);
-        when(crypto.encrypt(CUSTOMER.getEmail())).thenReturn(emailEncrypted);
-
-        when(jdbcTemplate.queryForObject(any(String.class), any(Object[].class), any(RowMapper.class))).thenReturn(CUSTOMER);
         service.findCustomer(CUSTOMER);
-        verify(jdbcTemplate).queryForObject(eq("SELECT * FROM customer WHERE firstname = ? AND secondname = ? AND email = ?"),
-                eq(new Object[]{firstNameEncrypted, secondNameEncrypted, emailEncrypted}),
-                any(RowMapper.class));
+        verify(jdbcTemplate).queryForObject(
+                eq("SELECT * FROM customer WHERE firstname = :firstname AND secondname = :secondname AND email = :email;"),
+                eq(PARAM_MAP),
+                any(RowMapper.class)
+        );
+
+    }
+
+    @Test
+    public void encryptAndSave() throws Exception {
+        service.encryptAndSave(CUSTOMER);
+        verify(jdbcTemplate).update(
+                eq("INSERT INTO customer(firstname, secondname, email) VALUES(:firstname, :secondname, :email);"),
+                eq(PARAM_MAP)
+        );
     }
 
 }

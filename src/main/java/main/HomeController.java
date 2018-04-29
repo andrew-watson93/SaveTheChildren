@@ -27,7 +27,7 @@ public class HomeController {
 
     @PostMapping("/save")
     public @ResponseBody
-    ResponseEntity saveCustomer(@RequestBody Customer customer) {
+    ResponseEntity saveCustomer(@RequestBody Customer customer) throws Exception {
         Customer existing = service.findCustomer(customer);
         if (existing != null) {
             service.updateCustomer(customer);
